@@ -1,6 +1,6 @@
 {
   "name": "jwt-function",
-  "version": "0.0.1",
+  "version": "0.0.11a",
   "description": "Simple way to generate & verify JWT",
   "author": "JuMastro <mastromonaco.julien@gmail.com>",
   "main": "lib/index.js",
