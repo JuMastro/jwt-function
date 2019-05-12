@@ -31,6 +31,19 @@ function mergeTruthy (target, source, properties) {
 }
 
 /**
+ * Convert a base64 to an object.
+ * @param {string} base64
+ * @returns {object}
+ */
+function base64ToObject (base64) {
+  try {
+    return JSON.parse(Buffer.from(base64, 'base64').toString('utf8'))
+  } catch (err) {
+    throw new Error('Provided base64 string is not parsable as object.')
+  }
+}
+
+/**
  * Convert an object to a base64 string.
  * @param {object} obj
  * @returns {string}
@@ -63,6 +76,7 @@ function isPlainObject (obj) {
 module.exports = {
   checkKey,
   mergeTruthy,
+  base64ToObject,
   objectToBase64Url,
   urlEncode,
   isPlainObject
