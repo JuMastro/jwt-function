@@ -17,12 +17,16 @@ const jwtfn = require('jwt-function')
 // Sign a token
 await jwtfn.sign({ user: 'Bob' }, 'secret')
 await jwtfn.sign({ user: 'Bob' }, 'secret', { iat: false }) // Disable iat (default true).
+
+// Decode a token
+await jwtfn.decode(token, 'secret')
+await jwtfn.decode(token, 'secret', { base64: true }) // Get base64 parts
 ```
 
 ## API
 
 ### sign(body, key, options)
-Sign asynchronously a JsonWebToken based on a payload and options object.
+Asynchronously sign a JsonWebToken based on a payload and options object.
 
   - **`body`** An `object` that represent the payload of the JWT, but it should not contains the specific JWT properties, it must be used from object options (required).
   - **`key`** A secret or private key as string or Buffer to sign the JWT. It depend on the selected algorithm (required).
@@ -50,3 +54,28 @@ await jwtfn.sign({ ... }, 'secret', { header: addedProps })
 ```
 
 The function return a `Promise<jwt: string>`.
+
+### decode(token, options)
+Asynchronously decode a JsonWebToken.
+
+  - **`token`** A JsonWebToken as string format to decode `(required)`.
+  - **`options`** A decode options object.
+    - **`base64`** The state to return a response with base64 parts `(default: false)`.
+
+##### Examples
+```javascript
+// Get base64 parts.
+await jwtfn.decode(token, 'secret', { base64: true })
+```
+Return an object like:
+```
+{
+  header: {...},
+  payload: {...},
+  base64: {
+    header: '...',
+    payload: '...',
+    signature: '...'
+  }
+}
+```
