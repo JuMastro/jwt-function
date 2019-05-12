@@ -1,0 +1,30 @@
+language: node_js
+node_js:
+  - '12'
+  - '12.1.0'
+branches:
+  only:
+    - master
+    - /^feature/
+    - /\bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z-]+(?:\.[\da-z-]+)*)?(?:\+[\da-z-]+(?:\.[\da-z-]+)*)?\b/
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+stages:
+  - name: test
+  - name: npm release
+    if: tag =~ /^\d+\.\d+\.\d+[a-z-]*$/
+after_script:
+  - ./cc-test-reporter after-build format-coverage -t lcov --exit-code $TRAVIS_TEST_RESULT
+jobs:
+  include:
+    - stage: npm release
+      node_js: '12'
+      script: echo "Deploying to npm ..."
+      deploy:
+        provider: npm
+        email: $NPM_EMAIL
+        api_key: $NPM_API_KEY
+        on:
+          tags: true
