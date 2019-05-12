@@ -32,6 +32,23 @@ describe('mergeTruthy()', () => {
   })
 })
 
+describe('base64ToObject()', () => {
+  test('work fine and return object', () => {
+    expect(() => {
+      const object = { isValid: true }
+      const base64 = Buffer.from(JSON.stringify(object)).toString('base64')
+      const parsed = utils.base64ToObject(base64)
+      expect(parsed).toEqual(object)
+    }).not.toThrowError()
+  })
+
+  test('throw error with invalid base64', () => {
+    const base64 = Buffer.from('{{Test').toString('base64')
+    expect(() => utils.base64ToObject(base64))
+      .toThrowError()
+  })
+})
+
 describe('objectToBase64Url()', () => {
   test('work fine and return object', () => {
     expect(() => {
