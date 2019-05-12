@@ -14,6 +14,7 @@ function getValidSignPayload () {
     iss: 'iss.example.com',
     aud: 'iss.example.com',
     sub: 'sub.auth-session',
+    jti: 'token-id',
     header: {}
   }
 }

@@ -44,6 +44,7 @@ const signDefinitions = {
   iss: { isValid: checks.isCompleteString, message: messages.strComplete },
   aud: { isValid: checks.isCompleteString, message: messages.strComplete },
   sub: { isValid: checks.isCompleteString, message: messages.strComplete },
+  jti: { isValid: checks.isCompleteString, message: messages.strComplete },
   header: { isValid: checks.isValidJwtHeader, message: messages.clearHeader }
 }
 
