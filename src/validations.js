@@ -1,8 +1,13 @@
 const { ALGORITHMS } = require('./constants.js')
+const { isArrayOf, isPlainObject } = require('./utils.js')
 
 const checks = {
   isString: (arg) => (
     typeof arg === 'string'
+  ),
+
+  isBoolean: (arg) => (
+    typeof arg === 'boolean'
   ),
 
   isCompleteString: (arg) => (
@@ -23,6 +28,31 @@ const checks = {
 
   isValidJwtHeader: (arg) => (
     typeof arg === 'object' && arg !== null && !('alg' in arg) && !('typ' in arg)
+  ),
+
+  isValidStringRange: (arg) => (
+    typeof arg === 'string' || isArrayOf(arg, (x) => typeof x === 'string')
+  ),
+
+  isValidCompleteStringRange: (arg) => (
+    checks.isCompleteString(arg) || isArrayOf(arg, checks.isCompleteString)
+  ),
+
+  isValidAlgorithmRange: (arg) => (
+    ALGORITHMS.includes(arg) || isArrayOf(arg, (x) => ALGORITHMS.includes(x))
+  ),
+
+  isValidMultiRange: (arg) => (
+    typeof arg === 'string' ||
+    arg instanceof RegExp ||
+    isArrayOf(arg, (x) => typeof x === 'string') ||
+    isArrayOf(arg, (x) => x instanceof RegExp)
+  ),
+
+  isValidMultiRangeObj: (arg) => (
+    isPlainObject(arg)
+      ? !Object.values(arg).map(checks.isValidMultiRange).includes(false)
+      : false
   )
 }
 
@@ -30,9 +60,15 @@ const messages = {
   alg: 'must match with implemented algorithms.',
   str: 'must be type string.',
   strComplete: 'must be a string that is not empty.',
+  boolean: 'must be a boolean.',
   timestamp: 'must be a timestamp number.',
   timestampTrue: 'must be a timestamp number or true.',
-  clearHeader: 'must be an object that does not contain any option property.'
+  clearHeader: 'must be an object that does not contain any option property.',
+  algRange: 'must be an allowed algorithm or an array of that.',
+  strRange: 'must be a string or an array of that.',
+  strCompleteRange: 'must be a valid string that not empty or an array of that.',
+  multiRange: 'must be a string, a regex or an array of that.',
+  multiRangeObj: 'must be an object who contain string, regex or an array of that.'
 }
 
 const signDefinitions = {
@@ -46,6 +82,21 @@ const signDefinitions = {
   sub: { isValid: checks.isCompleteString, message: messages.strComplete },
   jti: { isValid: checks.isCompleteString, message: messages.strComplete },
   header: { isValid: checks.isValidJwtHeader, message: messages.clearHeader }
+}
+
+const verifyDefinitions = {
+  alg: { required: true, isValid: checks.isValidAlgorithmRange, message: messages.algRange },
+  typ: { isValid: checks.isValidStringRange, message: messages.strRange },
+  iat: { isValid: checks.isValidTimestamp, message: messages.timestamp },
+  exp: { isValid: checks.isBoolean, message: messages.boolean },
+  nbf: { isValid: checks.isBoolean, message: messages.boolean },
+  iss: { isValid: checks.isValidMultiRange, message: messages.multiRange },
+  aud: { isValid: checks.isValidMultiRange, message: messages.multiRange },
+  sub: { isValid: checks.isValidMultiRange, message: messages.multiRange },
+  jti: { isValid: checks.isValidMultiRange, message: messages.multiRange },
+  header: { isValid: checks.isValidMultiRangeObj, message: messages.multiRangeObj },
+  payload: { isValid: checks.isValidMultiRangeObj, message: messages.multiRangeObj },
+  decode: { isValid: checks.isBoolean, message: messages.boolean }
 }
 
 /**
@@ -96,7 +147,8 @@ function _prepareSchema (schemaDefinitions) {
 module.exports = (() => {
   const schemas = {}
   const pending = {
-    sign: signDefinitions
+    sign: signDefinitions,
+    verify: verifyDefinitions
   }
 
   // Make usables schemas (Build validation method for each properties using definitions).
