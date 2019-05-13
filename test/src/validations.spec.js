@@ -1,7 +1,4 @@
-const validations = require('../../src/validations.js')
-const schemas = validations.schemas
-const validate = validations.validate
-const checks = validations.checks
+const { schemas, validate, checks } = require('../../src/validations.js')
 
 function getValidSignPayload () {
   const now = new Date().getTime()
@@ -67,6 +64,18 @@ describe('Test checks', () => {
     test('fail', () => {
       expect(checks.isString(['a'])).toBe(false)
       expect(checks.isString(null)).toBe(false)
+    })
+  })
+
+  describe('isBoolean()', () => {
+    test('done', () => {
+      expect(checks.isBoolean(true)).toBe(true)
+      expect(checks.isBoolean(false)).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isBoolean()).toBe(false)
+      expect(checks.isBoolean(null)).toBe(false)
     })
   })
 
@@ -136,6 +145,87 @@ describe('Test checks', () => {
       expect(checks.isValidJwtHeader({ alg: 'x' })).toBe(false)
       expect(checks.isValidJwtHeader({ typ: 'x' })).toBe(false)
       expect(checks.isValidJwtHeader('str')).toBe(false)
+    })
+  })
+
+  describe('isValidStringRange()', () => {
+    test('done', () => {
+      expect(checks.isValidStringRange('')).toBe(true)
+      expect(checks.isValidStringRange('str')).toBe(true)
+      expect(checks.isValidStringRange(['a', 'b'])).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isValidStringRange([])).toBe(false)
+      expect(checks.isValidStringRange(120)).toBe(false)
+      expect(checks.isValidStringRange(/regex/)).toBe(false)
+      expect(checks.isValidStringRange([/regex/])).toBe(false)
+    })
+  })
+
+  describe('isValidCompleteStringRange()', () => {
+    test('done', () => {
+      expect(checks.isValidCompleteStringRange('str')).toBe(true)
+      expect(checks.isValidCompleteStringRange(['a', 'b'])).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isValidCompleteStringRange('')).toBe(false)
+      expect(checks.isValidCompleteStringRange([/regex/, /regex/])).toBe(false)
+    })
+  })
+
+  describe('isValidAlgorithmRange()', () => {
+    test('done', () => {
+      expect(checks.isValidAlgorithmRange('HS256')).toBe(true)
+      expect(checks.isValidAlgorithmRange(['HS256', 'HS384'])).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isValidAlgorithmRange(/HS256/)).toBe(false)
+      expect(checks.isValidAlgorithmRange([/HS256/, /HS384/])).toBe(false)
+    })
+  })
+
+  describe('isValidMultiRange()', () => {
+    test('done with string', () => {
+      expect(checks.isValidMultiRange('HS256')).toBe(true)
+    })
+
+    test('done with regex', () => {
+      expect(checks.isValidMultiRange(/HS/)).toBe(true)
+    })
+
+    test('done with string[]', () => {
+      expect(checks.isValidMultiRange(['HS256'])).toBe(true)
+    })
+
+    test('done with string', () => {
+      expect(checks.isValidMultiRange([/HS\d{3}/, /PS\d{3}/])).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isValidMultiRange()).toBe(false)
+      expect(checks.isValidMultiRange({ x: 'test' })).toBe(false)
+      expect(checks.isValidMultiRange(null)).toBe(false)
+      expect(checks.isValidMultiRange(10)).toBe(false)
+    })
+  })
+
+  describe('isValidMultiRangeObj()', () => {
+    test('done with string', () => {
+      expect(checks.isValidMultiRangeObj({
+        a: 'str',
+        b: ['a', 'b'],
+        c: /ex/,
+        d: [/a/, /b/]
+      })).toBe(true)
+    })
+
+    test('fail', () => {
+      expect(checks.isValidMultiRangeObj()).toBe(false)
+      expect(checks.isValidMultiRangeObj({ a: 42 })).toBe(false)
+      expect(checks.isValidMultiRangeObj({ a: { a: 42 } })).toBe(false)
     })
   })
 })
