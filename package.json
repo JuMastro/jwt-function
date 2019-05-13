@@ -1,6 +1,6 @@
 {
   "name": "jwt-function",
-  "version": "1.0.1-a",
+  "version": "2.0.0",
   "description": "Simple way to sign, verify & decode JWT",
   "author": "JuMastro <mastromonaco.julien@gmail.com>",
   "main": "src/index.js",
