@@ -127,36 +127,35 @@ function validate (schema, data, reference = {}) {
  * @throws {Error} Required or invalid data.
  */
 function _prepareSchema (schemaDefinitions) {
-  const schema = {}
-
-  Object.entries(schemaDefinitions).map(([key, definition]) => {
-    Object.assign(schema, {
-      [key]: (value) => {
+  return Object.fromEntries(
+    Object.entries(schemaDefinitions).map(([key, definition]) => [
+      key,
+      (value) => {
         if ((!definition.required && !value) || definition.isValid(value)) {
           return value
         }
 
         throw new Error(`The "${key}" argument ${definition.message}`)
       }
-    })
-  })
-
-  return schema
+    ])
+  )
 }
 
 module.exports = (() => {
-  const schemas = {}
   const pending = {
     sign: signDefinitions,
     verify: verifyDefinitions
   }
 
   // Make usables schemas (Build validation method for each properties using definitions).
-  Object.entries(pending).forEach(([schemaKey, schemaDefinitions]) => {
-    Object.assign(schemas, {
-      [schemaKey]: _prepareSchema(schemaDefinitions)
-    })
-  })
+  const schemas = Object.fromEntries(
+    Object.entries(pending).map(([key, definitions]) => [
+      key,
+      _prepareSchema(definitions)
+    ])
+  )
+
+  console.log(schemas)
 
   return { validate, schemas, checks }
 })()
