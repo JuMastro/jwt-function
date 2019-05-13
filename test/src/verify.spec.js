@@ -4,30 +4,22 @@ const verify = require('../../src/verify.js')
 describe('verify()', () => {
   const secret = 'secret'
 
-  test('work fine and return true', async () => {
-    expect.assertions(1)
-    const token = await sign({ user: 'a1' }, secret)
-    const state = await verify(token, secret)
+  test('work fine and return true', () => {
+    const token = sign({ user: 'a1' }, secret)
+    const state = verify(token, secret)
     expect(state).toBe(true)
   })
 
-  test('work fine and return decoded token', async () => {
-    expect.assertions(2)
-    const token = await sign({ user: 'a1' }, secret)
-    const decoded = await verify(token, secret, { decode: true })
+  test('work fine and return decoded token', () => {
+    const token = sign({ user: 'a1' }, secret)
+    const decoded = verify(token, secret, { decode: true })
     expect(decoded).toHaveProperty('header')
     expect(decoded).toHaveProperty('payload')
   })
 
-  test('throw InvalidSignatureError', async () => {
-    expect.assertions(1)
-    const token = await sign({ user: 'a1' }, 'invalid-secret')
-
-    try {
-      await verify(token, secret)
-    } catch (err) {
-      expect(err).toHaveProperty('name', 'InvalidSignatureError')
-    }
+  test('throw InvalidSignatureError', () => {
+    const token = sign({ user: 'a1' }, 'invalid-secret')
+    expect(() => verify(token, secret)).toThrowError('The JWT signature is not valid')
   })
 })
 
@@ -101,11 +93,9 @@ describe('verifySegment()', () => {
   })
 
   test('throw an error when one prop is not valid', () => {
-    const segment = { sub: 'x_x', aud: 'hello', add: 'INVALID' }
-
     expect(() => {
-      const res = verify.verifySegment('payload', segment, definitions)
-      expect(res).toBe(segment)
+      const segment = { sub: 'x_x', aud: 'hello', add: 'INVALID' }
+      return verify.verifySegment('payload', segment, definitions)
     }).toThrowError('add')
   })
 })

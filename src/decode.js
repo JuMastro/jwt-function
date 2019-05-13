@@ -8,7 +8,7 @@ const REGEX_JWT = /^([\w-]+)\.([\w-]+)\.([\w-]+)$/
  * @param {string} token - The JsonWebToken.
  * @returns {Promise<InvalidTokenError, object>} { header, payload, base64? }
  */
-module.exports = async function decode (token, options = {}) {
+module.exports = function decode (token, options = {}) {
   try {
     const base64 = Boolean(options.base64)
     const [_, b64Header, b64Payload, b64Signature] = token.match(REGEX_JWT)

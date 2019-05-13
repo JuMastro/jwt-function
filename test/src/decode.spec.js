@@ -6,15 +6,15 @@ describe('decode()', () => {
   const b64Signature = 'S5aCs8bDB9YHUbVcnm6QH29S708tjEjVO8CWhzJPQJs'
   const token = [b64Header, b64Payload, b64Signature].join('.')
 
-  test('work fine with decodable token', async () => {
-    const { header, payload } = await decode(token)
+  test('work fine with decodable token', () => {
+    const { header, payload } = decode(token)
     expect(header).toHaveProperty('alg', 'HS256')
     expect(header).toHaveProperty('typ', 'JWT')
     expect(payload).toHaveProperty('bvv', 'Helloworld')
   })
 
-  test('work fine with decodable token and base64 option', async () => {
-    const { header, payload, base64 } = await decode(token, { base64: true })
+  test('work fine with decodable token and base64 option', () => {
+    const { header, payload, base64 } = decode(token, { base64: true })
     expect(header).toHaveProperty('alg', 'HS256')
     expect(header).toHaveProperty('typ', 'JWT')
     expect(payload).toHaveProperty('bvv', 'Helloworld')
@@ -23,9 +23,9 @@ describe('decode()', () => {
     expect(base64).toHaveProperty('signature', b64Signature)
   })
 
-  test('throw an error when provide no-decodable token', async () => {
+  test('throw an error when provide no-decodable token', () => {
     try {
-      await decode('aa.bb.cc')
+      decode('aa.bb.cc')
     } catch (err) {
       expect(err).toHaveProperty('name', 'InvalidTokenError')
     }

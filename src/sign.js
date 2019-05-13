@@ -25,34 +25,30 @@ const defaultOptions = {
  * @returns {Promise<Error, string>} JsonWebToken
  */
 module.exports = function sign (data, key, options = {}) {
-  return new Promise((resolve, reject) => {
-    if (!utils.isPlainObject(data)) {
-      return reject(new TypeError('The "data" argument must be a plain object.'))
-    }
+  if (!utils.isPlainObject(data)) {
+    throw new TypeError('The "data" argument must be a plain object.')
+  }
 
-    const opts = validations.validate(validations.schemas.sign, {
-      ...defaultOptions,
-      ...options
-    })
-
-    utils.checkKey(key)
-
-    opts.iat = (opts.iat && typeof opts.iat === 'boolean')
-      ? new Date().getTime()
-      : opts.iat
-
-    const headerObj = {
-      ...utils.mergeTruthy({}, opts, headerOptions),
-      ...(opts.header || {})
-    }
-
-    const payloadObj = utils.mergeTruthy(data, opts, payloadOptions)
-    const header = utils.objectToBase64Url(headerObj)
-    const payload = utils.objectToBase64Url(payloadObj)
-
-    signer.createSigner(key, opts)
-      .once('error', reject)
-      .once('respond', resolve)
-      .sign({ header, payload })
+  const opts = validations.validate(validations.schemas.sign, {
+    ...defaultOptions,
+    ...options
   })
+
+  utils.checkKey(key)
+
+  opts.iat = (opts.iat && typeof opts.iat === 'boolean')
+    ? new Date().getTime()
+    : opts.iat
+
+  const headerObj = {
+    ...utils.mergeTruthy({}, opts, headerOptions),
+    ...(opts.header || {})
+  }
+
+  const payloadObj = utils.mergeTruthy(data, opts, payloadOptions)
+  const header = utils.objectToBase64Url(headerObj)
+  const payload = utils.objectToBase64Url(payloadObj)
+
+  return signer.createSigner(key, opts)
+    .sign({ header, payload })
 }

@@ -31,34 +31,28 @@ const PAYLOAD_ARGS = ['iss', 'aud', 'sub']
  * @returns {boolean|object} True or decoded token.
  */
 module.exports = exports = function verify (token, key, options = {}) {
-  return new Promise(async (resolve, reject) => {
-    utils.checkKey(key)
+  const { header, payload, base64 } = decode(token, { base64: true })
+  const opts = validations.validate(validations.schemas.verify, {
+    ...defaultOptions,
+    ...options
+  })
 
-    const opts = validations.validate(validations.schemas.verify, {
-      ...defaultOptions,
-      ...options
-    })
+  utils.checkKey(key)
 
-    const { header, payload, base64 } = await decode(token, { base64: true })
+  verifyHeader(header, opts)
+  verifyPayload(payload, opts)
 
-    verifyHeader(header, opts)
-    verifyPayload(payload, opts)
-
-    const signer = createSigner(key, { alg: header.alg })
-    const stream = signer.sign({
+  const signed = createSigner(key, { alg: header.alg })
+    .sign({
       header: base64.header,
       payload: base64.payload
     })
 
-    stream.once('error', reject)
-    stream.once('respond', (signed) => {
-      if (signed !== token) {
-        reject(new InvalidSignatureError(signed, token))
-      } else {
-        resolve(!opts.decode ? true : { header, payload })
-      }
-    })
-  })
+  if (signed !== token) {
+    throw new InvalidSignatureError(signed, token)
+  } else {
+    return !opts.decode ? true : { header, payload }
+  }
 }
 
 /**

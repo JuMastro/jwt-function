@@ -10,18 +10,11 @@ describe('pub createSigner()', () => {
   test('work fine with valid algorithms', () => {
     ALGORITHMS.forEach((alg) => {
       expect(() => {
-        const stream = signer.createSigner(secret, { alg })
-        expect(stream.sign({ header, payload })).toBe(stream)
+        const token = signer.createSigner(secret, { alg })
+          .sign({ header, payload })
+        expect(token).toMatch(/[\w-]+.[\w-]+.[\w-]+/)
       }).not.toThrowError()
     })
-  })
-
-  test('work fine and emit stream valid response', async () => {
-    expect.assertions(1)
-    const stream = signer.createSigner(secret, { alg: 'HS256' })
-    setImmediate(() => stream.sign({ header, payload }))
-    const [res] = await once(stream, 'respond')
-    expect(res).toBe('HEADER.PAYLOAD.oow3estNnQUVp3fLALUr1TZiSlOoE7jI9KVSVNDThiI')
   })
 
   test('throw err response', async () => {
@@ -34,12 +27,5 @@ describe('pub createSigner()', () => {
     } catch (err) {
       expect(err).toHaveProperty('message', 'test')
     }
-  })
-})
-
-describe('getToken()', () => {
-  test('work fine and return "x.y.z" string format', () => {
-    expect(signer.getToken([Buffer.from('0')], 'x', 'y'))
-      .toBe('x.y.MA')
   })
 })

@@ -16,6 +16,7 @@ const ALG_SIGN_TYPES = {
 function createSigner (secret, { alg }) {
   const [_, type, bits] = alg.match(ALG_DECOMPOSER)
   const signer = ALG_SIGN_TYPES[type](bits, secret)
+
   return Object.assign(signer, {
     sign: signToken.bind(signer)
   })
@@ -28,33 +29,14 @@ function createSigner (secret, { alg }) {
  * @returns {Stream} SignerStream context.
  */
 function signToken ({ header, payload }) {
-  const chunks = []
+  this.update(`${header}.${payload}`)
 
-  this.once('end', () => this.emit('respond', getToken(chunks, header, payload)))
-  this.on('data', (chunk) => chunks.push(chunk))
-  this.end(`${header}.${payload}`)
-
-  return this
-}
-
-/**
- * Wrap tokens parts (header, payload, signature) to get a JsonWebToken.
- * @param {Array<string>} chunks - The signature chunks.
- * @param {string} header - The base64 header.
- * @param {string} payload - The base64 payload.
- * @returns {string} JsonWebToken.
- */
-function getToken (chunks, header, payload) {
-  const signature = chunks
-    .map((buff) => buff.toString('base64'))
-    .join('')
-
-  return [header, payload, urlEncode(signature)].join('.')
+  return `${header}.${payload}.${urlEncode(this.digest('base64'))}`
 }
 
 module.exports = {
   createSigner,
-  getToken,
+  signToken,
   ALG_DECOMPOSER,
   ALG_SIGN_TYPES
 }

@@ -15,19 +15,19 @@ Simple way to sign, verify & decode JWT
 const jwtfn = require('jwt-function')
 
 // Sign a token
-const token = await jwtfn.sign({ user: 'Bob' }, 'secret')
+const token = jwtfn.sign({ user: 'Bob' }, 'secret')
 
 // Verify a token
-await jwtfn.verify(token, 'secret')
+jwtfn.verify(token, 'secret')
 
 // Decode a token
-await jwtfn.decode(token, 'secret')
+jwtfn.decode(token, 'secret')
 ```
 
 ## API
 
 ### sign(body, key, options)
-Asynchronously sign a JsonWebToken based on a payload and options object.
+Sync sign a JsonWebToken based on a payload and options object.
 
   - **`body`** An `object` that represent the payload of the JWT, but it should not contains the specific JWT properties, it must be used from object options (required).
   - **`key`** A secret or private key as string or Buffer to sign the JWT. It depend on the selected algorithm (required).
@@ -54,10 +54,10 @@ const addedProps = { add1: 'add1', add2: 'add2' }
 await jwtfn.sign({ ... }, 'secret', { header: addedProps })
 ```
 
-The function return a `Promise<jwt: string>`.
+The function return a `jwt: string`.
 
 ### verify(token, key, options)
-Asynchronously verify a JsonWebToken.
+Sync verify a JsonWebToken.
 
   - **`token`** A JsonWebToken as string format to verify `(required)`.
   - **`key`** A secret or private key as string or Buffer to sign the JWT. It depend on the selected algorithm (required).
@@ -74,6 +74,8 @@ Asynchronously verify a JsonWebToken.
     - **`payload`** An object used as list of checks to do in payload part, it can provide string or regex, or an array of them `(default: null)`.
     - **`decode`** A boolean option to change the function return to get the decoded JWT `(default: null)`.
 
+The function return a `true|object`.
+
 ##### Examples
 ```javascript
 // Check the token is not expired and is yet mature.
@@ -89,16 +91,18 @@ jwtfn.verify(token, 'secret', {
 ```
 
 ### decode(token, options)
-Asynchronously decode a JsonWebToken.
+Sync decode a JsonWebToken.
 
   - **`token`** A JsonWebToken as string format to decode `(required)`.
   - **`options`** A decode options object.
     - **`base64`** The state to return a response with base64 parts `(default: false)`.
 
+The function return a `decoded: object`.
+
 ##### Examples
 ```javascript
 // Get base64 parts.
-await jwtfn.decode(token, 'secret', { base64: true })
+jwtfn.decode(token, 'secret', { base64: true })
 ```
 Return an object like:
 ```

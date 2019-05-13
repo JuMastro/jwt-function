@@ -155,7 +155,5 @@ module.exports = (() => {
     ])
   )
 
-  console.log(schemas)
-
   return { validate, schemas, checks }
 })()
