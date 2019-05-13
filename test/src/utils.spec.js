@@ -68,6 +68,18 @@ describe('urlEncode()', () => {
   })
 })
 
+describe('isArrayOf', () => {
+  test('work fine and return positive response', () => {
+    expect(utils.isArrayOf([0, 2, 4], Number.isInteger)).toBe(true)
+    expect(utils.isArrayOf(['a', 'b', 'c'], (x) => typeof x === 'string')).toBe(true)
+  })
+
+  test('work fine and return negative response', () => {
+    expect(utils.isArrayOf([0, '2', 4], Number.isInteger)).toBe(false)
+    expect(utils.isArrayOf(['a', 42, 'c'], (x) => typeof x === 'string')).toBe(false)
+  })
+})
+
 describe('isPlainObject()', () => {
   test('work fine and return positive response', () => {
     expect(utils.isPlainObject({})).toBe(true)
