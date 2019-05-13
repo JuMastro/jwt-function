@@ -15,12 +15,13 @@ Simple way to sign, verify & decode JWT
 const jwtfn = require('jwt-function')
 
 // Sign a token
-await jwtfn.sign({ user: 'Bob' }, 'secret')
-await jwtfn.sign({ user: 'Bob' }, 'secret', { iat: false }) // Disable iat (default true).
+const token = await jwtfn.sign({ user: 'Bob' }, 'secret')
+
+// Verify a token
+await jwtfn.verify(token, 'secret')
 
 // Decode a token
 await jwtfn.decode(token, 'secret')
-await jwtfn.decode(token, 'secret', { base64: true }) // Get base64 parts
 ```
 
 ## API
@@ -55,6 +56,38 @@ await jwtfn.sign({ ... }, 'secret', { header: addedProps })
 
 The function return a `Promise<jwt: string>`.
 
+### verify(token, key, options)
+Asynchronously verify a JsonWebToken.
+
+  - **`token`** A JsonWebToken as string format to verify `(required)`.
+  - **`key`** A secret or private key as string or Buffer to sign the JWT. It depend on the selected algorithm (required).
+  - **`options`** A verify options object, it primary used to define token verification.
+    - **`alg`** A string or an array of string to match with token algorithm `(default: 'HS256') (required)`.
+    - **`typ`** A string to or an array of strings to compare with `typ` header argument `(default: null)`.
+    - **`iat`** A timestamp to check if the token has been signed after this timestamp `(default: null)`.
+    - **`exp`** A boolean to define the check state of the expiration date, in case it's true the field is required to be valid, an error will be thrown if the field does not exist on the token. If the field is equal to null then the verification will be checked only if the field exists on the token. Else the token is equal false, the verification will not be done.`(default: null)`.
+    - **`nbf`** A boolean to define the check state of the date from which the JWT is valid, in case it's true the field is required to be valid, an error will be thrown if the field does not exist on the token. If the field is equal to null then the verification will be checked only if the field exists on the token. Else the token is equal false, the verification will not be done.`(default: null)`.
+    - **`iss`** A issuer verification, it can be string or regex, or an array of them `(default: null)`.
+    - **`aud`** A audience verification, it can be string or regex, or an array of them `(default: null)`.
+    - **`sub`** A subject verification, it can be string or regex, or an array of them `(default: null)`.
+    - **`header`** An object used as list of checks to do in header part, it can provide string or regex, or an array of them `(default: null)`.
+    - **`payload`** An object used as list of checks to do in payload part, it can provide string or regex, or an array of them `(default: null)`.
+    - **`decode`** A boolean option to change the function return to get the decoded JWT `(default: null)`.
+
+##### Examples
+```javascript
+// Check the token is not expired and is yet mature.
+jwtfn.verify(token, 'secret', { exp: true, nbf: true })
+
+// Check the token header (same for payload).
+jwtfn.verify(token, 'secret', {
+  header: {
+    add1: 'add1', // Should be equal
+    add2: [/remove/, '/add/'] // Should has one or more matches
+  }
+})
+```
+
 ### decode(token, options)
 Asynchronously decode a JsonWebToken.
 
@@ -79,3 +112,19 @@ Return an object like:
   }
 }
 ```
+
+### Errors
+
+  - **`InvalidTokenError`** Root error
+  - **`InvalidSignatureError`** When the signature not match with the JWT.
+  - **`InvalidAlgorithmError`** When the algorithm is not allowed on the options.
+  - **`InvalidTypeError`** When the JWT type is not validated by the options..
+  - **`InvalidIssuedAtError`** When the token iat timestamp is lower than the options.
+  - **`ExpiredSignatureError`** When the token exp timestamp is lower than now.
+  - **`ImmatureSignatureError`** When the token nbf timestamp is greater than now.
+  - **`InvalidIssuerError`** When then issuer is not validated by options.
+  - **`InvalidAudienceError`** When the audience is not validated by options.
+  - **`InvalidSubjectError`** When the subject is not validated by options.
+  - **`InvalidTokenIDError`** When the tokenID is not validated by options.
+  - **`InvalidHeaderError`** When any defined verification options header is not valid.
+  - **`InvalidPayloadError`** When any defined verification options payload is not valid.
