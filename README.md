@@ -21,7 +21,7 @@ const token = jwtfn.sign({ user: 'Bob' }, 'secret')
 jwtfn.verify(token, 'secret')
 
 // Decode a token
-jwtfn.decode(token, 'secret')
+jwtfn.decode(token)
 ```
 
 ## API
@@ -102,7 +102,7 @@ The function return a `decoded: object`.
 ##### Examples
 ```javascript
 // Get base64 parts.
-jwtfn.decode(token, 'secret', { base64: true })
+jwtfn.decode(token, { base64: true })
 ```
 Return an object like:
 ```
