@@ -65,6 +65,18 @@ function urlEncode (str) {
 }
 
 /**
+ * Check if the array is an array of any *type* (condition).
+ * @param {Array<any>} array - The checked array.
+ * @param {function} condition - The callback filter.
+ * @returns {boolean}
+ */
+function isArrayOf (array, condition) {
+  return Array.isArray(array) &&
+    array.length > 0 &&
+    array.length === array.filter(condition).length
+}
+
+/**
  * Check if obj is a plain object.
  * @param {object} obj
  * @returns {boolean}
@@ -79,5 +91,6 @@ module.exports = {
   base64ToObject,
   objectToBase64Url,
   urlEncode,
+  isArrayOf,
   isPlainObject
 }
