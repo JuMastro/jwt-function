@@ -47,11 +47,11 @@ Sync sign a JsonWebToken based on a payload and options object.
 ```javascript
 // Limit the token validity to 1 day.
 const expiration = new Date().getTime() + (24 * 60 * 60)
-await jwtfn.sign({ ... }, 'secret', { exp: expiration })
+jwtfn.sign({ ... }, 'secret', { exp: expiration })
 
 // Add header properties.
 const addedProps = { add1: 'add1', add2: 'add2' }
-await jwtfn.sign({ ... }, 'secret', { header: addedProps })
+jwtfn.sign({ ... }, 'secret', { header: addedProps })
 ```
 
 The function return a `jwt: string`.
