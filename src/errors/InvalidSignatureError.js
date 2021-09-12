@@ -7,7 +7,7 @@ module.exports = class InvalidSignatureError extends InvalidTokenError {
    */
   constructor (current, expected) {
     super(
-      `The JWT signature is not valid, it does not match with provided token.`,
+      'The JWT signature is not valid, it does not match with provided token.',
       null,
       current,
       expected

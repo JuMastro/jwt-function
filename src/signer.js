@@ -4,7 +4,7 @@ const { urlEncode } = require('./utils.js')
 const ALG_DECOMPOSER = /^(\w{2})(\d{3})$/
 const ALG_SIGN_TYPES = {
   // TODO: Implement RS alg
-  'HS': (bits, secret) => createHmac(`sha${bits}`, secret)
+  HS: (bits, secret) => createHmac(`sha${bits}`, secret)
 }
 
 /**
