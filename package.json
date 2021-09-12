@@ -2,7 +2,7 @@
   "name": "jwt-function",
   "version": "2.0.2",
   "description": "Simple way to sign, verify & decode JWT",
-  "author": "JuMastro <mastromonaco.julien@gmail.com>",
+  "author": "JuMastro <25881035+JuMastro@users.noreply.github.com>",
   "main": "src/index.js",
   "license": "MIT",
   "homepage": "https://github.com/JuMastro/jwt-function",
